@@ -1,10 +1,12 @@
 # kv-store
 インメモリのkey-valueストア
-書籍Cloud Native Go3章を参孝に実装
+書籍Cloud Native Go4章を参孝
 - [x] CRUDの実装
 - [x] ロックを取らない方法を考える
   - mapを使用している限りはスレッドセーフにならない
   - [スレッドセーフなHashMap実装を使う](https://github.com/cornelk/hashmap)
+- [x] ホットリロードを開発環境で使えるようにする
+  - `make up`
 - [ ] バリデーション
     - 特にリクエストからメモリにデータを展開しているのでBodyのサイズは要確認
 - [ ] トランザクションログをファイルに書き出す
