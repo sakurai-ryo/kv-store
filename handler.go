@@ -9,6 +9,7 @@ import (
 )
 
 func PutHandler(w http.ResponseWriter, r *http.Request) {
+	// データサイズの制限
 	l, err := strconv.Atoi(r.Header.Get("Content-Length"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -18,6 +19,10 @@ func PutHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, ErrorDataLimitExceeded.Error(), http.StatusForbidden)
 		return
 	}
+
+	// 全体のメモリの50%以上をhashMapが使用しないように確認する
+	//var ms runtime.MemStats
+	//fmt.Println(ms.Alloc)
 
 	vars := mux.Vars(r)
 	key := vars["key"]

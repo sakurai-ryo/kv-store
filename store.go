@@ -9,7 +9,7 @@ type InMemoryStore struct {
 }
 
 var Store = InMemoryStore{
-	m: &hashmap.HashMap{},
+	m: hashmap.New(10000), // 1MBで初期化
 }
 
 func Put(key string, value string) error {
