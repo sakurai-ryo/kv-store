@@ -5,13 +5,23 @@ import (
 	"github.com/gorilla/mux"
 	"io"
 	"net/http"
+	"strconv"
 )
 
 func PutHandler(w http.ResponseWriter, r *http.Request) {
+	l, err := strconv.Atoi(r.Header.Get("Content-Length"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if l > 4000 {
+		http.Error(w, ErrorDataLimitExceeded.Error(), http.StatusForbidden)
+		return
+	}
+
 	vars := mux.Vars(r)
 	key := vars["key"]
 
-	// TODO: メモリに展開する前にサイズチェックする
 	value, err := io.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
