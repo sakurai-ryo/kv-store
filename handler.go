@@ -8,6 +8,14 @@ import (
 	"strconv"
 )
 
+type TransactionLogger interface {
+	WritePut(key, value string)
+	WriteDelete(key string)
+	Err() <-chan error
+	ReadEvents() (<-chan Event, <-chan error)
+	Run()
+}
+
 func PutHandler(w http.ResponseWriter, r *http.Request) {
 	// データサイズの制限
 	l, err := strconv.Atoi(r.Header.Get("Content-Length"))
