@@ -1,6 +1,6 @@
 # kv-store
 インメモリのkey-valueストア
-書籍Cloud Native Go4章を参孝
+[Cloud Native Go5章](https://github.com/cloud-native-go/examples/tree/main/ch05) を参孝
 - [x] CRUDの実装
 - [x] ロックを取らない方法を考える
   - mapを使用している限りはスレッドセーフにならない
