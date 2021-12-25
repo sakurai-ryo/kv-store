@@ -1,21 +1,24 @@
 package main
 
-import "sync"
+import (
+	"github.com/cornelk/hashmap"
+	"sync"
+)
 
 type InMemoryStore struct {
 	sync.RWMutex
-	m map[string]string
+	m *hashmap.HashMap
 }
 
 var Store = InMemoryStore{
-	m: make(map[string]string),
+	m: &hashmap.HashMap{},
 }
 
 func Put(key string, value string) error {
 	Store.Lock()
 	defer Store.Unlock()
 
-	Store.m[key] = value
+	Store.m.Set(key, value)
 
 	return nil
 }
@@ -24,20 +27,22 @@ func Get(key string) (string, error) {
 	Store.RLock()
 	defer Store.RUnlock()
 
-	value, ok := Store.m[key]
+	value, ok := Store.m.Get(key)
 
 	if !ok {
 		return "", ErrorNoSuchKey
 	}
 
-	return value, nil
+	v := value.(string)
+
+	return v, nil
 }
 
 func Delete(key string) error {
 	Store.Lock()
 	defer Store.Unlock()
 
-	delete(Store.m, key)
+	Store.m.Del(key)
 
 	return nil
 }
