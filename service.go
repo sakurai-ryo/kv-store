@@ -40,7 +40,7 @@ func InitTransactionLog() error {
 	return err
 }
 
-func InitServer() {
+func StartServer() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
 	defer cancel()
 
