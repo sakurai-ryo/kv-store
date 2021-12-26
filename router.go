@@ -18,9 +18,17 @@ func loggingMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+func maxReqBodyMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.Body = http.MaxBytesReader(w, r.Body, MAX_BODY_SIZE)
+		next.ServeHTTP(w, r)
+	})
+}
+
 func NewRouter() *mux.Router {
 	router := mux.NewRouter()
 	router.Use(loggingMiddleware)
+	router.Use(maxReqBodyMiddleware)
 
 	router.HandleFunc("/{key}", PutHandler).Methods("PUT")
 	router.HandleFunc("/{key}", GetHandler).Methods("GET")

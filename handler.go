@@ -5,7 +5,6 @@ import (
 	"github.com/gorilla/mux"
 	"io"
 	"net/http"
-	"strconv"
 )
 
 type TransactionLogger interface {
@@ -17,21 +16,6 @@ type TransactionLogger interface {
 }
 
 func PutHandler(w http.ResponseWriter, r *http.Request) {
-	// データサイズの制限
-	l, err := strconv.Atoi(r.Header.Get("Content-Length"))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if l > 4000 {
-		http.Error(w, ErrorDataLimitExceeded.Error(), http.StatusForbidden)
-		return
-	}
-
-	// 全体のメモリの50%以上をhashMapが使用しないように確認する
-	//var ms runtime.MemStats
-	//fmt.Println(ms.Alloc)
-
 	vars := mux.Vars(r)
 	key := vars["key"]
 
