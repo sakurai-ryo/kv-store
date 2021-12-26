@@ -25,14 +25,14 @@ func maxReqBodyMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func NewRouter() *mux.Router {
+func NewRouter(handler StoreHandler) *mux.Router {
 	router := mux.NewRouter()
 	router.Use(loggingMiddleware)
 	router.Use(maxReqBodyMiddleware)
 
-	router.HandleFunc("/{key}", PutHandler).Methods("PUT")
-	router.HandleFunc("/{key}", GetHandler).Methods("GET")
-	router.HandleFunc("/{key}", DeleteHandler).Methods("DELETE")
+	router.HandleFunc("/{key}", handler.PutHandler).Methods("PUT")
+	router.HandleFunc("/{key}", handler.GetHandler).Methods("GET")
+	router.HandleFunc("/{key}", handler.DeleteHandler).Methods("DELETE")
 
 	return router
 }

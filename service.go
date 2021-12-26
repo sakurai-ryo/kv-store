@@ -11,12 +11,12 @@ import (
 	"time"
 )
 
-func InitTransactionLog() error {
+func InitFileTransactionLogger() (*FileTransactionLogger, error) {
 	var err error
 
 	logger, err := NewFileTransactionLogger(LOG_FILE)
 	if err != nil {
-		return fmt.Errorf("%s: %w", ErrorCreateLogger.Error(), err)
+		return nil, fmt.Errorf("%s: %w", ErrorCreateLogger.Error(), err)
 	}
 
 	events, errors := logger.ReadEvents()
@@ -34,17 +34,20 @@ func InitTransactionLog() error {
 			}
 		}
 	}
+	if err != nil {
+		return nil, err
+	}
 
 	logger.Run()
 
-	return err
+	return logger, nil
 }
 
-func StartServer() {
+func StartServer(handler StoreHandler) {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
 	defer cancel()
 
-	router := NewRouter()
+	router := NewRouter(handler)
 
 	server := &http.Server{
 		Addr:    ":" + strconv.FormatUint(uint64(PORT), 10),

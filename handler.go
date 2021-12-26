@@ -7,19 +7,24 @@ import (
 	"net/http"
 )
 
-type TransactionLogger interface {
-	WritePut(key, value string)
-	WriteDelete(key string)
-	Err() <-chan error
-	ReadEvents() (<-chan Event, <-chan error)
-	Run()
+type Handler struct {
+	TransactionLogger
 }
 
-func PutHandler(w http.ResponseWriter, r *http.Request) {
+func NewHandler(logger TransactionLogger) *Handler {
+	return &Handler{
+		TransactionLogger: logger,
+	}
+}
+
+func (h *Handler) PutHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	key := vars["key"]
 
 	value, err := io.ReadAll(r.Body)
+
+	go h.WritePut(key, string(value))
+
 	defer r.Body.Close()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -35,7 +40,7 @@ func PutHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-func GetHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	key := vars["key"]
 
@@ -52,9 +57,11 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(value))
 }
 
-func DeleteHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) DeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	key := vars["key"]
+
+	go h.WriteDelete(key)
 
 	err := Delete(key)
 	if err != nil {
