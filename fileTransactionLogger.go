@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
+	"strings"
 )
 
 type EventType byte
@@ -72,6 +74,20 @@ func (l *FileTransactionLogger) Run() {
 	}()
 }
 
+func mappingLogToEvent(e *Event, str string) error {
+	line := strings.Split(str, "\t")
+	sequence, err := strconv.ParseUint(line[0], 10, 64)
+	if err != nil {
+		return err
+	}
+	ty, err := strconv.Atoi(line[1])
+	if err != nil {
+		return err
+	}
+	e.Sequence, e.EventType, e.Key, e.Value = sequence, EventType(ty), line[2], strings.Join(line[2:], " ")
+	return nil
+}
+
 func (l *FileTransactionLogger) ReadEvents() (<-chan Event, <-chan error) {
 	scanner := bufio.NewScanner(l.file)
 	outEvent := make(chan Event)
@@ -83,9 +99,12 @@ func (l *FileTransactionLogger) ReadEvents() (<-chan Event, <-chan error) {
 		defer close(outError)
 
 		for scanner.Scan() {
-			line := scanner.Text()
-			if _, err := fmt.Sscanf(line, LOG_FORMAT, &e.Sequence, &e.EventType, &e.Key, &e.Value); err != nil {
-				outError <- fmt.Errorf("%s: %w", ErrorLogParse, err)
+			//if _, err := fmt.Sscanf(line, LOG_FORMAT, &e.Sequence, &e.EventType, &e.Key, &e.Value); err != nil {
+			//	outError <- fmt.Errorf("%s: %w", ErrorLogParse, err)
+			//	return
+			//}
+			if err := mappingLogToEvent(&e, scanner.Text()); err != nil {
+				outError <- err
 				return
 			}
 
