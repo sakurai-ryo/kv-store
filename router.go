@@ -12,6 +12,7 @@ func loggingMiddleware(next http.Handler) http.Handler {
 			"method": r.Method,
 			"host":   r.Host,
 			"path":   r.URL.Path,
+			"Length": r.ContentLength,
 			"Ua":     r.UserAgent,
 		}).Info("incoming request")
 		next.ServeHTTP(w, r)
