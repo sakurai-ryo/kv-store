@@ -2,7 +2,7 @@
 インメモリのkey-valueストア
 [Cloud Native Go5章](https://github.com/cloud-native-go/examples/tree/main/ch05) を参孝
 
-やりたいこと↓
+時間があるときにやりたいこと↓
 - [x] CRUDの実装
 - [x] ロックを取らない方法を考える
   - mapを使用している限りはスレッドセーフにならない
